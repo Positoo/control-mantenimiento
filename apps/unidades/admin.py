@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import UnidadDeNegocio
+
+
+@admin.register(UnidadDeNegocio)
+class UnidadDeNegocioAdmin(admin.ModelAdmin):
+    list_display = ("id", "nombre", "activo")
+    list_filter = ("activo",)
+    search_fields = ("nombre",)
