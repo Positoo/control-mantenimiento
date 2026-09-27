@@ -11,6 +11,16 @@ class OrdenTrabajo(models.Model):
         related_name="ordenes_trabajo",
     )
 
+    unidad_de_negocio = models.ForeignKey(
+        "unidades.UnidadDeNegocio",
+        on_delete=models.PROTECT,
+    )
+
+    alcance = models.ForeignKey(
+        "unidades.Alcance",
+        on_delete=models.PROTECT,
+    )
+
     movil = models.CharField(max_length=20, blank=True)
     dominio = models.CharField(max_length=20)
 

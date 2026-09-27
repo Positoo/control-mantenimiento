@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+{% load moneda %}
+
+{% block title %}Costos de mantenimiento{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Costos de mantenimiento</h2>
+            <p class="text-secondary mb-0">
+                Gastos por Unidad de Negocio, Alcance y Unidad.
+            </p>
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+
+    <div class="card bg-dark border-secondary mb-4">
+        <div class="card-header border-secondary">
+            <strong>Filtros</strong>
+        </div>
+
+        <div class="card-body">
+
+            <form method="get">
+
+                <div class="row g-3">
+
+                    <div class="col-md-2">
+                        <label class="form-label">
+                            Fecha desde
+                        </label>
+                        <input
+                            type="date"
+                            name="fecha_desde"
+                            value="{{ fecha_desde }}"
+                            class="form-control"
+                        >
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">
+                            Fecha hasta
+                        </label>
+                        <input
+                            type="date"
+                            name="fecha_hasta"
+                            value="{{ fecha_hasta }}"
+                            class="form-control"
+                        >
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            Unidad de Negocio
+                        </label>
+
+                        <select
+                            name="unidad_negocio"
+                            class="form-select"
+                        >
+                            <option value="">
+                                Todas
+                            </option>
+
+                            {% for negocio in unidades_de_negocio %}
+                                <option
+                                    value="{{ negocio.id }}"
+                                    {% if unidad_negocio == negocio.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ negocio.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            Alcance
+                        </label>
+
+                        <select
+                            name="alcance"
+                            class="form-select"
+                        >
+                            <option value="">
+                                Todos
+                            </option>
+
+                            {% for alcance_obj in alcances %}
+                                <option
+                                    value="{{ alcance_obj.id }}"
+                                    {% if alcance == alcance_obj.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ alcance_obj.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">
+                            Móvil
+                        </label>
+
+                        <input
+                            type="text"
+                            name="movil"
+                            value="{{ movil }}"
+                            class="form-control"
+                            placeholder="Móvil"
+                        >
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            Tipo de mantenimiento
+                        </label>
+
+                        <select
+                            name="tipo"
+                            class="form-select"
+                        >
+                            <option value="">
+                                Todos
+                            </option>
+
+                            <option
+                                value="preventivo"
+                                {% if tipo == "preventivo" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Preventivo
+                            </option>
+
+                            <option
+                                value="correctivo"
+                                {% if tipo == "correctivo" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Correctivo
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="mt-4">
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Consultar
+                    </button>
+
+                    <a
+                        href="{% url 'reporte_costos' %}"
+                        class="btn btn-outline-secondary"
+                    >
+                        Limpiar filtros
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- RESULTADO -->
+
+    <div class="card bg-dark border-secondary">
+
+        <div class="card-header border-secondary">
+            <strong>Resultado</strong>
+        </div>
+
+        <div class="card-body">
+
+            {% if reporte %}
+
+                {% for negocio in reporte %}
+
+                    <!-- UNIDAD DE NEGOCIO -->
+
+                    <div class="border-bottom border-secondary pb-3 mb-3">
+
+                        <div
+                            class="d-flex justify-content-between align-items-center py-2"
+                            role="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#negocio-{{ forloop.counter }}"
+                            aria-expanded="false"
+                        >
+
+                            <div>
+                                <span class="me-2" id="flecha-{{ forloop.counter }}">
+                                    ▶
+                                </span>
+
+                                <strong class="fs-5">
+                                    {{ negocio.negocio.nombre }}
+                                </strong>
+                            </div>
+
+                            <div class="text-end">
+
+                                <span class="text-secondary">
+                                    Preventivo
+                                </span>
+                                {{ negocio.preventivo|moneda_ar }}
+
+                                <span class="text-secondary ms-3">
+                                    Correctivo
+                                </span>
+                                {{ negocio.correctivo|moneda_ar }}
+
+                                <strong class="ms-3">
+                                    {{ negocio.total|moneda_ar }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ALCANCES OCULTOS -->
+
+                        <div
+                            class="collapse"
+                            id="negocio-{{ forloop.counter }}"
+                        >
+
+                            {% for alcance_item in negocio.alcances %}
+
+                                <div class="ms-4 mt-3">
+
+                                    <div
+                                        class="d-flex justify-content-between align-items-center"
+                                    >
+
+                                        <div>
+                                            <strong>
+                                                {{ alcance_item.alcance.nombre }}
+                                            </strong>
+                                        </div>
+
+                                        <div class="text-end">
+
+                                            <span class="text-secondary">
+                                                Preventivo
+                                            </span>
+                                            {{ alcance_item.preventivo|moneda_ar }}
+
+                                            <span class="text-secondary ms-3">
+                                                Correctivo
+                                            </span>
+                                            {{ alcance_item.correctivo|moneda_ar }}
+
+                                            <strong class="ms-3">
+                                                {{ alcance_item.total|moneda_ar }}
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- UNIDADES -->
+
+                                    <div class="table-responsive mt-2">
+
+                                        <table
+                                            class="table table-dark table-sm align-middle"
+                                        >
+
+                                            <thead>
+
+                                                <tr>
+                                                    <th>Unidad</th>
+
+                                                    <th class="text-end">
+                                                        Preventivo
+                                                    </th>
+
+                                                    <th class="text-end">
+                                                        Correctivo
+                                                    </th>
+
+                                                    <th class="text-end">
+                                                        Total
+                                                    </th>
+                                                </tr>
+
+                                            </thead>
+
+                                            <tbody>
+
+                                                {% for unidad_item in alcance_item.unidades %}
+
+                                                    <tr>
+
+                                                        <td>
+
+                                                            {% if unidad_item.unidad.movil %}
+                                                                {{ unidad_item.unidad.movil }}
+                                                            {% else %}
+                                                                —
+                                                            {% endif %}
+
+                                                            {% if unidad_item.unidad.dominio %}
+
+                                                                <span class="text-secondary">
+                                                                    ({{ unidad_item.unidad.dominio }})
+                                                                </span>
+
+                                                            {% endif %}
+
+                                                        </td>
+
+                                                        <td class="text-end">
+                                                            {{ unidad_item.preventivo|moneda_ar }}
+                                                        </td>
+
+                                                        <td class="text-end">
+                                                            {{ unidad_item.correctivo|moneda_ar }}
+                                                        </td>
+
+                                                        <td class="text-end">
+
+                                                            <strong>
+                                                                {{ unidad_item.total|moneda_ar }}
+                                                            </strong>
+
+                                                        </td>
+
+                                                    </tr>
+
+                                                {% endfor %}
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TOTAL GENERAL -->
+
+                    <div class="mt-4 pt-3 border-top border-secondary">
+
+                        <div class="d-flex justify-content-between">
+
+                            <strong class="fs-5">
+                                TOTAL GENERAL
+                            </strong>
+
+                            <div>
+
+                                <span class="text-secondary">
+                                    Preventivo
+                                </span>
+                                {{ total_general_preventivo|moneda_ar }}
+
+                                <span class="text-secondary ms-3">
+                                    Correctivo
+                                </span>
+                                {{ total_general_correctivo|moneda_ar }}
+
+                                <strong class="ms-3 fs-5">
+                                    {{ total_general|moneda_ar }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                
+                {% endfor %}
+
+            {% else %}
+
+                <div class="text-center text-secondary py-5">
+                    No hay datos para los filtros seleccionados.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll("[data-bs-toggle='collapse']")
+            .forEach(function (elemento) {
+
+                const destino = document.querySelector(
+                    elemento.getAttribute("data-bs-target")
+                );
+
+                const flecha = elemento.querySelector("span");
+
+                destino.addEventListener("show.bs.collapse", function () {
+                    flecha.textContent = "▼";
+                });
+
+                destino.addEventListener("hide.bs.collapse", function () {
+                    flecha.textContent = "▶";
+                });
+
+            });
+
+    });
+</script>
+
+{% endblock %}

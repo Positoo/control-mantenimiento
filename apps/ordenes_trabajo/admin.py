@@ -44,6 +44,8 @@ class OrdenTrabajoAdmin(admin.ModelAdmin):
     list_display = (
         "mostrar_numero_ot",
         "unidad",
+        "unidad_de_negocio",
+        "alcance",
         "movil",
         "dominio",
         "fecha_ingreso",

@@ -20,4 +20,5 @@ urlpatterns = [
         views.buscar_unidad,
         name="buscar_unidad",
     ),
+    path("reportes/costos/", views.reporte_costos, name="reporte_costos"),
 ]
