@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load moneda %}
 
 {% block title %}
     Órdenes de Trabajo | Control Mantenimiento
@@ -15,7 +16,7 @@
         </p>
     </div>
 
-    <a href="#" class="btn btn-primary">
+    <a href="{% url 'nueva_ot' %}" class="btn btn-primary">
         + Nueva OT
     </a>
 
@@ -267,16 +268,16 @@
                         </td>
 
                         <td>
-                            $ {{ ot.costo_preventivo|floatformat:2 }}
+                             {{ ot.costo_preventivo|moneda_ar }}
                         </td>
 
                         <td>
-                            $ {{ ot.costo_correctivo|floatformat:2 }}
+                             {{ ot.costo_correctivo|moneda_ar }}
                         </td>
 
                         <td>
                             <strong>
-                                $ {{ ot.costo_total|floatformat:2 }}
+                                 {{ ot.costo_total|moneda_ar }}
                             </strong>
                         </td>
 
@@ -293,7 +294,10 @@
                         </td>
 
                         <td class="text-end">
-                            <a href="#" class="btn btn-sm btn-outline-light">
+                            <a
+                                href="{% url 'detalle_ot' ot.pk %}"
+                                class="btn btn-sm btn-outline-light"
+                            >
                                 Ver
                             </a>
                         </td>

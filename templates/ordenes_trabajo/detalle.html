@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+{% load moneda %}
+
+{% block title %}
+    {{ ot.numero_ot }} | Control Mantenimiento
+{% endblock %}
+
+{% block content %}
+
+<!-- Encabezado -->
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="mb-1">
+            {{ ot.numero_ot }}
+        </h2>
+
+        <p class="text-secondary mb-0">
+            Detalle de la Orden de Trabajo
+        </p>
+    </div>
+
+    <div>
+
+        {% if ot.fecha_egreso %}
+            <span class="badge text-bg-success fs-6">
+                Cerrada
+            </span>
+        {% else %}
+            <span class="badge text-bg-warning fs-6">
+                Abierta
+            </span>
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- Datos de la OT -->
+
+<div class="card bg-dark border-secondary mb-4">
+
+    <div class="card-header border-secondary">
+        <strong>Datos de la Orden de Trabajo</strong>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-3">
+                <small class="text-secondary">Fecha ingreso</small>
+                <div>
+                    {{ ot.fecha_ingreso|date:"d/m/Y" }}
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <small class="text-secondary">Fecha egreso</small>
+                <div>
+                    {% if ot.fecha_egreso %}
+                        {{ ot.fecha_egreso|date:"d/m/Y" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <small class="text-secondary">Días detenido</small>
+                <div>
+                    {% if ot.dias_detenido is not None %}
+                        {{ ot.dias_detenido }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <small class="text-secondary">Móvil</small>
+                <div>
+                    {{ ot.movil|default:"—" }}
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <small class="text-secondary">Dominio</small>
+                <div>
+                    {{ ot.dominio }}
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <small class="text-secondary">Kilómetros</small>
+                <div>
+                    {% if ot.kilometros %}
+                        {{ ot.kilometros }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <small class="text-secondary">Horas</small>
+                <div>
+                    {% if ot.horas %}
+                        {{ ot.horas }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Trabajos realizados -->
+
+<div class="card bg-dark border-secondary mb-4">
+
+    <div class="card-header border-secondary">
+        <strong>Trabajos realizados</strong>
+    </div>
+
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+
+            <table class="table table-dark table-hover align-middle mb-0">
+
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Observaciones</th>
+                        <th>Cantidad</th>
+                        <th>Costo unitario</th>
+                        <th>Total</th>
+                        <th>Proveedor</th>
+                        <th>Comprobante</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for detalle in ot.detalles.all %}
+
+                    <tr>
+
+                        <td>
+                            {% if detalle.tipo == "PREVENTIVO" %}
+                                <span class="badge text-bg-info">
+                                    Preventivo
+                                </span>
+                            {% else %}
+                                <span class="badge text-bg-danger">
+                                    Correctivo
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ detalle.observaciones }}
+                        </td>
+
+                        <td>
+                            {{ detalle.cantidad }}
+                        </td>
+
+                        <td>
+                            $ {{ detalle.costo_unitario|moneda_ar }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                $ {{ detalle.costo_total|moneda_ar }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ detalle.proveedor|default:"—" }}
+                        </td>
+
+                        <td>
+                            {% if detalle.tipo_de_comprobante %}
+                                {{ detalle.get_tipo_de_comprobante_display }}
+
+                                {% if detalle.numero_de_comprobante %}
+                                    <br>
+                                    <small class="text-secondary">
+                                        Nº {{ detalle.numero_de_comprobante }}
+                                    </small>
+                                {% endif %}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td
+                            colspan="7"
+                            class="text-center text-secondary py-4"
+                        >
+                            No hay trabajos registrados.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Resumen de costos -->
+
+<div class="row justify-content-end">
+
+    <div class="col-md-5">
+
+        <div class="card bg-dark border-secondary">
+
+            <div class="card-header border-secondary">
+                <strong>Resumen de costos</strong>
+            </div>
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-secondary">
+                        Preventivo
+                    </span>
+
+                    <span>
+                        $ {{ ot.costo_preventivo|moneda_ar }}
+                    </span>
+                </div>
+
+
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-secondary">
+                        Correctivo
+                    </span>
+
+                    <span>
+                        $ {{ ot.costo_correctivo|moneda_ar }}
+                    </span>
+                </div>
+
+
+                <hr class="border-secondary">
+
+
+                <div class="d-flex justify-content-between fs-5">
+
+                    <strong>
+                        Total
+                    </strong>
+
+                    <strong>
+                        $ {{ ot.costo_total|moneda_ar }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Volver -->
+
+<div class="mt-4">
+
+    <a
+        href="{% url 'inicio' %}"
+        class="btn btn-outline-light"
+    >
+        ← Volver al listado
+    </a>
+
+</div>
+
+{% endblock %}

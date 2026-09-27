@@ -1,0 +1,567 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Nueva OT | Control Mantenimiento
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Nueva Orden de Trabajo</h2>
+        <p class="text-secondary mb-0">
+            Registrar una nueva Orden de Trabajo
+        </p>
+    </div>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <div class="card bg-dark border-secondary text-light mb-4">
+        <div class="card-header border-secondary">
+            <strong>Unidad</strong>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label for="{{ form.unidad_busqueda.id_for_label }}" class="form-label">
+                        Dominio o Móvil
+                    </label>
+
+                    {{ form.unidad_busqueda }}
+
+                    <div class="form-text text-secondary">
+                        Ingrese el dominio o móvil de la unidad.
+                    </div>
+
+                    <div id="resultado-unidad" class="mt-2"></div>
+
+                    {% if form.unidad_busqueda.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.unidad_busqueda.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-dark border-secondary text-light mb-4">
+        <div class="card-header border-secondary">
+            <strong>Datos de la Orden de Trabajo</strong>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label for="{{ form.fecha_ingreso.id_for_label }}" class="form-label">
+                        Fecha de ingreso
+                    </label>
+
+                    {{ form.fecha_ingreso }}
+
+                    {% if form.fecha_ingreso.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.fecha_ingreso.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.kilometros.id_for_label }}" class="form-label">
+                        Kilómetros
+                    </label>
+
+                    {{ form.kilometros }}
+
+                    {% if form.kilometros.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.kilometros.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.horas.id_for_label }}" class="form-label">
+                        Horas
+                    </label>
+
+                    {{ form.horas }}
+
+                    {% if form.horas.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.horas.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label for="{{ form.fecha_egreso.id_for_label }}" class="form-label">
+                        Fecha de egreso
+                    </label>
+
+                    {{ form.fecha_egreso }}
+
+                    {% if form.fecha_egreso.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.fecha_egreso.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                        Observaciones
+                    </label>
+
+                    {{ form.observaciones }}
+
+                    {% if form.observaciones.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ form.observaciones.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!------------------------------Trbajos-------------------------------------------------->
+
+<div class="card bg-dark border-secondary text-light mb-4">
+    <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+        <strong>Trabajos realizados</strong>
+
+        <button
+            type="button"
+            id="agregar-trabajo"
+            class="btn btn-sm btn-outline-light"
+        >
+            + Agregar trabajo
+        </button>
+    </div>
+
+    <div class="card-body">
+
+        {{ formset.management_form }}
+
+        <div id="trabajos-container">
+
+            {% for detalle_form in formset %}
+                <div class="trabajo-form border border-secondary rounded p-3 mb-3">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Tipo
+                            </label>
+
+                            {{ detalle_form.tipo }}
+
+                            {% if detalle_form.tipo.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ detalle_form.tipo.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-5">
+                            <label class="form-label">
+                                Observaciones
+                            </label>
+
+                            {{ detalle_form.observaciones }}
+
+                            {% if detalle_form.observaciones.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ detalle_form.observaciones.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">
+                                Cantidad
+                            </label>
+
+                            {{ detalle_form.cantidad }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">
+                                Costo unitario
+                            </label>
+
+                            {{ detalle_form.costo_unitario }}
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">
+                                Total
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control total-trabajo"
+                                value="$ 0"
+                                readonly
+                            >
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Proveedor
+                            </label>
+
+                            {{ detalle_form.proveedor }}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Tipo de comprobante
+                            </label>
+
+                            {{ detalle_form.tipo_de_comprobante }}
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">
+                                Nº de comprobante
+                            </label>
+
+                            {{ detalle_form.numero_de_comprobante }}
+                        </div>
+
+                        <div class="col-12 text-end">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-danger eliminar-trabajo"
+                            >
+                                Eliminar
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- Plantilla utilizada por JavaScript -->
+        <template id="trabajo-vacio">
+            <div class="trabajo-form border border-secondary rounded p-3 mb-3">
+
+                <div class="row g-3">
+
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo</label>
+                        {{ formset.empty_form.tipo }}
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="form-label">Observaciones</label>
+                        {{ formset.empty_form.observaciones }}
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Cantidad</label>
+                        {{ formset.empty_form.cantidad }}
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Costo unitario</label>
+                        {{ formset.empty_form.costo_unitario }}
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">
+                            Total
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control total-trabajo"
+                            value="$ 0"
+                            readonly
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Proveedor</label>
+                        {{ formset.empty_form.proveedor }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo de comprobante</label>
+                        {{ formset.empty_form.tipo_de_comprobante }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Nº de comprobante</label>
+                        {{ formset.empty_form.numero_de_comprobante }}
+                    </div>
+
+                    <div class="col-12 text-end">
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-danger eliminar-trabajo"
+                        >
+                            Eliminar
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </template>
+
+    </div>
+</div>
+
+    <!---------------------------Fin Trabajos------------------------------------------------>
+
+<div class="card bg-dark border-secondary text-light mb-4">
+    <div class="card-header border-secondary">
+        <strong>Resumen de costos</strong>
+    </div>
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between mb-2">
+            <span class="text-secondary">Preventivo</span>
+            <strong id="total-preventivo">$ 0</strong>
+        </div>
+
+        <div class="d-flex justify-content-between mb-2">
+            <span class="text-secondary">Correctivo</span>
+            <strong id="total-correctivo">$ 0</strong>
+        </div>
+
+        <hr class="border-secondary">
+
+        <div class="d-flex justify-content-between fs-5">
+            <strong>Total OT</strong>
+            <strong id="total-ot">$ 0</strong>
+        </div>
+
+    </div>
+</div>
+
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'inicio' %}" class="btn btn-outline-light">
+            ← Cancelar
+        </a>
+
+        <button type="submit" class="btn btn-primary">
+            Guardar OT
+        </button>
+    </div>
+
+</form>
+
+<!-----------------------------------------------SCRIPT---------------------------------------->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const campo = document.getElementById(
+        "{{ form.unidad_busqueda.id_for_label }}"
+    );
+
+    const resultado = document.getElementById(
+        "resultado-unidad"
+    );
+
+    let temporizador;
+
+    campo.addEventListener("input", function () {
+
+        clearTimeout(temporizador);
+
+        const valor = campo.value.trim();
+
+        resultado.innerHTML = "";
+
+        if (!valor) {
+            return;
+        }
+
+        temporizador = setTimeout(function () {
+
+            fetch(
+                "{% url 'buscar_unidad' %}?valor="
+                + encodeURIComponent(valor)
+            )
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.encontrada) {
+
+                    resultado.innerHTML = `
+                        <div class="alert alert-success py-2">
+                            <strong>Unidad encontrada</strong><br>
+                            Dominio: ${data.dominio}
+                            ${data.movil
+                                ? " — Móvil: " + data.movil
+                                : ""}
+                        </div>
+                    `;
+
+                } else {
+
+                    resultado.innerHTML = `
+                        <div class="alert alert-warning py-2">
+                            ${data.mensaje}
+                        </div>
+                    `;
+                }
+            })
+            .catch(() => {
+
+                resultado.innerHTML = `
+                    <div class="alert alert-danger py-2">
+                        No se pudo consultar la unidad.
+                    </div>
+                `;
+            });
+
+        }, 400);
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const container = document.getElementById("trabajos-container");
+    const botonAgregar = document.getElementById("agregar-trabajo");
+    const template = document.getElementById("trabajo-vacio");
+
+    const totalForms = document.getElementById(
+        "id_detalles-TOTAL_FORMS"
+    );
+
+    function agregarTrabajo() {
+
+        const indice = parseInt(totalForms.value);
+
+        const html = template.innerHTML.replace(
+            /__prefix__/g,
+            indice
+        );
+
+        container.insertAdjacentHTML("beforeend", html);
+
+        totalForms.value = indice + 1;
+    }
+
+    botonAgregar.addEventListener("click", agregarTrabajo);
+
+    container.addEventListener("click", function (event) {
+
+        if (!event.target.classList.contains("eliminar-trabajo")) {
+            return;
+        }
+
+        const trabajo = event.target.closest(".trabajo-form");
+
+        trabajo.remove();
+    });
+
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const container = document.getElementById("trabajos-container");
+
+    function formatearMoneda(valor) {
+        return "$ " + Math.round(valor).toLocaleString("es-AR");
+    }
+
+    function calcularTotales() {
+
+        let totalPreventivo = 0;
+        let totalCorrectivo = 0;
+
+        const trabajos = container.querySelectorAll(".trabajo-form");
+
+        trabajos.forEach(function (trabajo) {
+
+            const cantidad = trabajo.querySelector(
+                '[name$="-cantidad"]'
+            );
+
+            const costoUnitario = trabajo.querySelector(
+                '[name$="-costo_unitario"]'
+            );
+
+            const tipo = trabajo.querySelector(
+                '[name$="-tipo"]'
+            );
+
+            const totalCampo = trabajo.querySelector(
+                ".total-trabajo"
+            );
+
+            if (!cantidad || !costoUnitario || !tipo || !totalCampo) {
+                return;
+            }
+
+            const cantidadValor = parseFloat(cantidad.value) || 0;
+            const costoValor = parseFloat(costoUnitario.value) || 0;
+
+            const total = cantidadValor * costoValor;
+
+            totalCampo.value = formatearMoneda(total);
+
+            if (tipo.value === "PREVENTIVO") {
+                totalPreventivo += total;
+            }
+
+            if (tipo.value === "CORRECTIVO") {
+                totalCorrectivo += total;
+            }
+        });
+
+        document.getElementById(
+            "total-preventivo"
+        ).textContent = formatearMoneda(totalPreventivo);
+
+        document.getElementById(
+            "total-correctivo"
+        ).textContent = formatearMoneda(totalCorrectivo);
+
+        document.getElementById(
+            "total-ot"
+        ).textContent = formatearMoneda(
+            totalPreventivo + totalCorrectivo
+        );
+    }
+
+    container.addEventListener("input", calcularTotales);
+    container.addEventListener("change", calcularTotales);
+
+    calcularTotales();
+
+});
+</script>
+
+<!---------------------------------------------FIN SCRIPT-------------------------------------->
+
+{% endblock %}

@@ -1,8 +1,9 @@
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
+from django.http import JsonResponse
 
 from .models import DetalleOrdenTrabajo, OrdenTrabajo
-
+from .forms import DetalleOrdenTrabajoFormSet, OrdenTrabajoForm
 
 def inicio(request):
     ordenes = OrdenTrabajo.objects.all()
@@ -54,3 +55,94 @@ def inicio(request):
             "fecha_hasta": fecha_hasta,
         },
     )
+
+
+def detalle_ot(request, pk):
+    ot = get_object_or_404(
+        OrdenTrabajo,
+        pk=pk,
+    )
+
+    return render(
+        request,
+        "ordenes_trabajo/detalle.html",
+        {
+            "ot": ot,
+        },
+    )
+
+def nueva_ot(request):
+    if request.method == "POST":
+        form = OrdenTrabajoForm(request.POST)
+        formset = DetalleOrdenTrabajoFormSet(request.POST)
+
+        if form.is_valid() and formset.is_valid():
+            ot = form.save(commit=False)
+
+            ot.unidad = form.cleaned_data["unidad_busqueda"]
+            ot.movil = ot.unidad.movil or ""
+            ot.dominio = ot.unidad.dominio
+
+            ot.save()
+
+            detalles = formset.save(commit=False)
+
+            for detalle in detalles:
+                detalle.orden_trabajo = ot
+                detalle.save()
+
+            return redirect(
+                "detalle_ot",
+                pk=ot.pk,
+            )
+
+    else:
+        form = OrdenTrabajoForm()
+        formset = DetalleOrdenTrabajoFormSet()
+
+    return render(
+        request,
+        "ordenes_trabajo/nueva.html",
+        {
+            "form": form,
+            "formset": formset,
+        },
+    )
+
+def buscar_unidad(request):
+    valor = request.GET.get("valor", "").strip()
+
+    if not valor:
+        return JsonResponse({
+            "encontrada": False,
+            "mensaje": "Ingrese un dominio o móvil.",
+        })
+
+    from apps.unidades.models import Unidad
+
+    unidades = Unidad.objects.filter(
+        activo=True
+    ).filter(
+        Q(dominio__iexact=valor) | Q(movil__iexact=valor)
+    )
+
+    if not unidades.exists():
+        return JsonResponse({
+            "encontrada": False,
+            "mensaje": "No existe una unidad activa con ese dominio o móvil.",
+        })
+
+    if unidades.count() > 1:
+        return JsonResponse({
+            "encontrada": False,
+            "mensaje": "Hay más de una unidad que coincide con ese valor.",
+        })
+
+    unidad = unidades.first()
+
+    return JsonResponse({
+        "encontrada": True,
+        "id": unidad.id_interno,
+        "dominio": unidad.dominio,
+        "movil": unidad.movil or "",
+    })
