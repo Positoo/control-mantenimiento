@@ -84,20 +84,24 @@
 
                 <div class="nav flex-column">
 
-                    <a href="#" class="nav-link">
-                        Inicio
+                    <a href="{% url 'inicio' %}" class="nav-link">
+                         OTs (inicio)
+                    </a>
+
+                    <a href="{% url 'nueva_ot' %}" class="nav-link">
+                        Nueva OT
                     </a>
 
                     <a href="#" class="nav-link">
                         Unidades
                     </a>
 
-                    <a href="#" class="nav-link active">
+                    <a href="#" class="nav-link">
                         Órdenes de Trabajo
                     </a>
 
-                    <a href="#" class="nav-link">
-                        Reportes
+                    <a href="{% url 'reporte_costos' %}" class="nav-link">
+                        Reportes de costos
                     </a>
 
                 </div>
