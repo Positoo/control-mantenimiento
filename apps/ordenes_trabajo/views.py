@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import permission_required
+from django.db import transaction
 
 from .models import DetalleOrdenTrabajo, OrdenTrabajo
 from .forms import DetalleOrdenTrabajoFormSet, OrdenTrabajoForm
@@ -301,6 +302,69 @@ def nueva_ot(request):
             "formset": formset,
         },
     )
+
+
+@permission_required(
+    "ordenes_trabajo.change_ordentrabajo",
+    raise_exception=True,
+)
+def editar_ot(request, pk):
+    ot = get_object_or_404(
+        OrdenTrabajo,
+        pk=pk,
+    )
+
+    if request.method == "POST":
+        form = OrdenTrabajoForm(request.POST, instance=ot)
+        formset = DetalleOrdenTrabajoFormSet(
+            request.POST,
+            instance=ot,
+        )
+
+        if form.is_valid() and formset.is_valid():
+            with transaction.atomic():
+
+                ot = form.save(commit=False)
+
+                unidad = form.cleaned_data["unidad_busqueda"]
+
+                ot.unidad = unidad
+                ot.movil = unidad.movil or ""
+                ot.dominio = unidad.dominio
+                ot.unidad_de_negocio = unidad.unidad_de_negocio
+                ot.alcance = unidad.alcance
+
+                ot.save()
+
+                formset.save()
+
+            return redirect(
+                "detalle_ot",
+                pk=ot.pk,
+            )
+
+    else:
+        form = OrdenTrabajoForm(
+            instance=ot,
+            initial={
+                "unidad_busqueda": ot.dominio,
+            },
+        )
+
+        formset = DetalleOrdenTrabajoFormSet(
+            instance=ot,
+        )
+
+    return render(
+        request,
+        "ordenes_trabajo/editar.html",
+        {
+            "form": form,
+            "formset": formset,
+            "ot": ot,
+        },
+    )
+
 
 def buscar_unidad(request):
     valor = request.GET.get("valor", "").strip()

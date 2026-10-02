@@ -11,6 +11,11 @@ urlpatterns = [
         name="nueva_ot",
     ),
     path(
+    "ot/<int:pk>/editar/",
+    views.editar_ot,
+    name="editar_ot",
+    ),
+    path(
         "ot/<int:pk>/",
         views.detalle_ot,
         name="detalle_ot",

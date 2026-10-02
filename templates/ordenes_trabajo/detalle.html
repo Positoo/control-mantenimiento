@@ -175,12 +175,12 @@
                         </td>
 
                         <td>
-                            $ {{ detalle.costo_unitario|moneda_ar }}
+                             {{ detalle.costo_unitario|moneda_ar }}
                         </td>
 
                         <td>
                             <strong>
-                                $ {{ detalle.costo_total|moneda_ar }}
+                                 {{ detalle.costo_total|moneda_ar }}
                             </strong>
                         </td>
 
@@ -249,7 +249,7 @@
                     </span>
 
                     <span>
-                        $ {{ ot.costo_preventivo|moneda_ar }}
+                         {{ ot.costo_preventivo|moneda_ar }}
                     </span>
                 </div>
 
@@ -260,7 +260,7 @@
                     </span>
 
                     <span>
-                        $ {{ ot.costo_correctivo|moneda_ar }}
+                         {{ ot.costo_correctivo|moneda_ar }}
                     </span>
                 </div>
 
@@ -275,7 +275,7 @@
                     </strong>
 
                     <strong>
-                        $ {{ ot.costo_total|moneda_ar }}
+                         {{ ot.costo_total|moneda_ar }}
                     </strong>
 
                 </div>
@@ -289,9 +289,9 @@
 </div>
 
 
-<!-- Volver -->
+<!-- Acciones -->
 
-<div class="mt-4">
+<div class="mt-4 d-flex gap-2">
 
     <a
         href="{% url 'inicio' %}"
@@ -299,6 +299,15 @@
     >
         ← Volver al listado
     </a>
+
+    {% if perms.ordenes_trabajo.change_ordentrabajo %}
+        <a
+            href="{% url 'editar_ot' ot.pk %}"
+            class="btn btn-warning"
+        >
+            Editar OT
+        </a>
+    {% endif %}
 
 </div>
 

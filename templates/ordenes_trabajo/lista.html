@@ -300,6 +300,16 @@
                             >
                                 Ver
                             </a>
+
+                            {% if perms.ordenes_trabajo.change_ordentrabajo %}
+                                <a
+                                    href="{% url 'editar_ot' ot.pk %}"
+                                    class="btn btn-sm btn-outline-warning"
+                                >
+                                    Editar
+                                </a>
+                            {% endif %}
+                        
                         </td>
 
                     </tr>
