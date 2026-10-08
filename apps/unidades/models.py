@@ -61,3 +61,4 @@ class Unidad(models.Model):
 
     def __str__(self):
         return f"{self.id_interno} - {self.dominio}"   #aqui agregar self.movil cuando tengamos definido por movil
+    

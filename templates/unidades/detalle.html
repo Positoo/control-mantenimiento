@@ -1,0 +1,138 @@
+
+{% extends "base.html" %}
+
+{% block title %}Ficha de Unidad | Control Mantenimiento{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-2">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Ficha de Unidad</h2>
+            <p class="text-secondary mb-0">
+                Información completa de la unidad registrada.
+            </p>
+        </div>
+
+        <a href="{% url 'lista_unidades' %}" class="btn btn-outline-secondary">
+            Volver al listado
+        </a>
+    </div>
+
+    <div class="card bg-dark border-secondary mb-4">
+        <div class="card-header border-secondary">
+            <h5 class="mb-0">
+                {{ unidad.dominio }}
+                {% if unidad.movil %}
+                    <span class="text-secondary">· {{ unidad.movil }}</span>
+                {% endif %}
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <h6 class="text-secondary mb-3">Identificación</h6>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="text-secondary small">ID interno</div>
+                    <div>{{ unidad.id_interno }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="text-secondary small">Dominio</div>
+                    <div>{{ unidad.dominio }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="text-secondary small">Móvil</div>
+                    <div>{{ unidad.movil|default:"-" }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="text-secondary small">Estado</div>
+                    {% if unidad.activo %}
+                        <span class="badge bg-success">Activa</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactiva</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr class="border-secondary">
+
+            <h6 class="text-secondary mb-3">Datos del vehículo</h6>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="text-secondary small">Marca</div>
+                    <div>{{ unidad.marca|default:"-" }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="text-secondary small">Modelo</div>
+                    <div>{{ unidad.modelo|default:"-" }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="text-secondary small">Nro. de chasis</div>
+                    <div>{{ unidad.nro_chasis|default:"-" }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="text-secondary small">Nro. de motor</div>
+                    <div>{{ unidad.nro_motor|default:"-" }}</div>
+                </div>
+            </div>
+
+            <hr class="border-secondary">
+
+            <h6 class="text-secondary mb-3">Capacidades</h6>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="text-secondary small">Capacidad (m³)</div>
+                    <div>{{ unidad.capacidad_m3|default_if_none:"-" }}</div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="text-secondary small">Capacidad (TN)</div>
+                    <div>{{ unidad.capacidad_tn|default_if_none:"-" }}</div>
+                </div>
+            </div>
+
+            <hr class="border-secondary">
+
+            <h6 class="text-secondary mb-3">Asignación</h6>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="text-secondary small">Unidad de negocio</div>
+                    <div>{{ unidad.unidad_de_negocio|default:"-" }}</div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="text-secondary small">Alcance</div>
+                    <div>{{ unidad.alcance|default:"-" }}</div>
+                </div>
+            </div>
+
+            <hr class="border-secondary">
+
+            <h6 class="text-secondary mb-3">Observaciones</h6>
+
+            <div class="text-break">
+                {% if unidad.observaciones %}
+                    {{ unidad.observaciones|linebreaksbr }}
+                {% else %}
+                    <span class="text-secondary">Sin observaciones.</span>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,8 +1,9 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import JsonResponse
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db import transaction
+
 
 from .models import DetalleOrdenTrabajo, OrdenTrabajo
 from .forms import DetalleOrdenTrabajoFormSet, OrdenTrabajoForm
@@ -12,6 +13,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from django.http import HttpResponse
 
+@login_required
 def inicio(request):
     ordenes = OrdenTrabajo.objects.all()
 
@@ -63,7 +65,7 @@ def inicio(request):
         },
     )
 
-
+@login_required
 def reporte_costos(request):
     from collections import defaultdict
     from apps.unidades.models import UnidadDeNegocio, Alcance
@@ -244,7 +246,7 @@ def reporte_costos(request):
         },
     )
 
-
+@login_required
 def detalle_ot(request, pk):
     ot = get_object_or_404(
         OrdenTrabajo,
@@ -365,7 +367,7 @@ def editar_ot(request, pk):
         },
     )
 
-
+@login_required
 def buscar_unidad(request):
     valor = request.GET.get("valor", "").strip()
 
@@ -405,7 +407,7 @@ def buscar_unidad(request):
     })
 
 ############## PARA EXPORTAR COMO EXCEL ############
-
+@login_required
 def exportar_costos_excel(request):
     from collections import defaultdict
     from apps.unidades.models import UnidadDeNegocio, Alcance

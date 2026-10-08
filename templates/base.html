@@ -19,6 +19,12 @@
 
         .navbar {
             background-color: #151515 !important;
+            border-bottom: 1px solid #333;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            letter-spacing: 0.3px;
         }
 
         .sidebar {
@@ -27,13 +33,16 @@
         }
 
         .sidebar-title {
-            color: #888;
+            color: #777;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
         }
 
         .nav-link {
             color: #bdbdbd;
             border-radius: 6px;
             margin-bottom: 4px;
+            padding: 9px 12px;
         }
 
         .nav-link:hover {
@@ -46,9 +55,49 @@
             color: #ffffff;
         }
 
+        .menu-section {
+            color: #777;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        .submenu {
+            padding-left: 12px;
+        }
+
+        .submenu .nav-link {
+            font-size: 0.95rem;
+        }
+
+        .user-panel {
+            border-top: 1px solid #333;
+            margin-top: 24px;
+            padding-top: 16px;
+        }
+
+        .username {
+            color: #e5e5e5;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            color: #777;
+            font-size: 0.8rem;
+        }
+
+        .logout-button {
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: transparent;
+        }
+
         .main-content {
             background-color: #1e1e1e;
-            min-height: calc(100vh - 56px);
+            min-height: calc(100vh - 57px);
         }
 
         .card.bg-dark {
@@ -78,35 +127,96 @@
             <!-- Menú lateral -->
             <aside class="col-md-2 sidebar min-vh-100 p-3">
 
-                <h6 class="text-uppercase sidebar-title mb-3">
-                    Menú
-                </h6>
-
                 <div class="nav flex-column">
 
+                    <!-- Inicio -->
                     <a href="{% url 'inicio' %}" class="nav-link">
-                         OTs (inicio)
+                        Inicio
                     </a>
 
-                    <a href="{% url 'nueva_ot' %}" class="nav-link">
-                        Nueva OT
-                    </a>
 
-                    <a href="#" class="nav-link">
-                        Unidades
-                    </a>
-
-                    <a href="#" class="nav-link">
+                    <!-- Órdenes de Trabajo -->
+                    <div class="menu-section">
                         Órdenes de Trabajo
-                    </a>
+                    </div>
 
-                    <a href="{% url 'reporte_costos' %}" class="nav-link">
-                        Reportes de costos
-                    </a>
+                    <div class="submenu">
+
+                        <a href="{% url 'inicio' %}" class="nav-link">
+                            Listado de OTs
+                        </a>
+
+                        {% if perms.ordenes_trabajo.add_ordentrabajo %}
+                            <a href="{% url 'nueva_ot' %}" class="nav-link">
+                                Nueva OT
+                            </a>
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Reportes -->
+                    <div class="menu-section">
+                        Reportes
+                    </div>
+
+                    <div class="submenu">
+
+                        <a href="{% url 'reporte_costos' %}" class="nav-link">
+                            Costos de mantenimiento
+                        </a>
+
+                    </div>
+
+
+                    <!-- Maestro de Unidades -->
+                    <div class="menu-section">
+                        Maestros
+                    </div>
+
+                    <div class="submenu">
+
+                        <a href="{% url 'lista_unidades' %}" class="nav-link">
+                            Unidades
+                        </a>
+
+                    </div>
+
+
+                    <!-- Usuario -->
+                    <div class="user-panel">
+
+                        <div class="username">
+                            {{ user.username }}
+                        </div>
+
+                        {% if user.is_superuser %}
+                            <div class="user-role">
+                                Super Usuario
+                            </div>
+                        {% else %}
+                            <div class="user-role">
+                                Usuario
+                            </div>
+                        {% endif %}
+
+                        <form method="post" action="{% url 'logout' %}" class="mt-3">
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="nav-link logout-button"
+                            >
+                                Cerrar sesión
+                            </button>
+                        </form>
+
+                    </div>
 
                 </div>
 
             </aside>
+
 
             <!-- Contenido -->
             <main class="col-md-10 main-content p-4">
@@ -118,6 +228,7 @@
 
         </div>
     </div>
+
 
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
